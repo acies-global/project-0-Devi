@@ -1,4 +1,3 @@
-
 import argparse
 from pathlib import Path
 
@@ -12,9 +11,7 @@ from app.writer import write_chunks
 def main() -> None:
     """Run the document toolkit CLI."""
 
-    parser = argparse.ArgumentParser(
-        description="Read, clean and chunk documents into JSON."
-    )
+    parser = argparse.ArgumentParser(description="Read, clean and chunk documents into JSON.")
 
     parser.add_argument(
         "folder",
@@ -67,7 +64,4 @@ def main() -> None:
     # Count documents represented in the generated chunks
     document_count = len({chunk.source for chunk in chunks})
 
-    print(
-        f"Wrote {len(chunks)} chunks from "
-        f"{document_count} non-empty documents to {args.out}"
-    )
+    print(f"Wrote {len(chunks)} chunks from {document_count} non-empty documents to {args.out}")
