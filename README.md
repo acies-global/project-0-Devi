@@ -184,6 +184,7 @@ uv run ruff format --check .
 uv run pytest             # tests
 uv run python -m app <input folder > --out <output>  # run the cli
 uv run python -m app corpus --out chunks.json # here corpus is the input folder and chunks.json is the output file
+uv run pytest # run testcase 
 uv run pytest --cov=app #for testing the testcase coverage
 ```
 
