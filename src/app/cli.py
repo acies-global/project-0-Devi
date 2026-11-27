@@ -8,6 +8,7 @@ from pydantic import ValidationError
 from app.config import load_document_settings
 from app.models import Settings
 from app.pipeline import build_chunks
+from app.report import build_summary_report, format_summary_report
 from app.writer import write_chunks
 
 logger = logging.getLogger(__name__)
@@ -89,6 +90,9 @@ def main() -> None:
 
     # Build chunks
     chunks = build_chunks(args.folder, settings)
+    report = build_summary_report(chunks, settings.size)
+
+    logger.info("\n%s", format_summary_report(report))
 
     # Write JSON output
     write_chunks(chunks, args.out)

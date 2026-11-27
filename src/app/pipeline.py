@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from app.chunker import chunk_words
+from app.chunker import chunk_heading_sentence
 from app.cleaner import clean_text
 from app.models import Chunk, Settings
 from app.reader import read_documents
@@ -8,12 +8,13 @@ from app.reader import read_documents
 
 def build_chunks(folder: Path, settings: Settings) -> list[Chunk]:
     """Read, clean and chunk every supported document."""
+
     chunks: list[Chunk] = []
 
     for file_path, original_text in read_documents(folder):
         cleaned_text = clean_text(original_text)
 
-        text_chunks = chunk_words(
+        text_chunks = chunk_heading_sentence(
             cleaned_text,
             size=settings.size,
             overlap=settings.overlap,
@@ -29,6 +30,7 @@ def build_chunks(folder: Path, settings: Settings) -> list[Chunk]:
                 text=chunk_text,
                 word_count=len(chunk_text.split()),
             )
+
             chunks.append(chunk)
 
     return chunks
