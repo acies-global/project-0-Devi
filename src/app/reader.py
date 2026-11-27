@@ -31,7 +31,7 @@ def read_documents(folder: Path) -> Iterator[tuple[Path, str]]:
         A tuple containing the file path and its text content.
     """
 
-    for file_path in folder.rglob("*"):
+    for file_path in sorted(folder.rglob("*")):
         if not file_path.is_file():
             continue
 
