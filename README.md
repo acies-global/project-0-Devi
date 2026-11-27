@@ -75,6 +75,45 @@ Each Pydantic model is converted into a dictionary using model_dump() before bei
 
 Uses Python's argparse module to accept the input folder, output file, chunk size, and overlap from the command line. The CLI executes the complete processing pipeline and prints a one-line summary after successful execution.
 
+# Word-based chunking
+
+The chunk_words() function splits cleaned text into chunks based on a configurable word count.
+
+Features:
+
+Supports configurable chunk size (default: 200 words).
+Supports configurable overlap between consecutive chunks.
+Prevents unnecessary empty or redundant chunks.
+Validates chunk size and overlap settings.
+Returns an empty list when the input contains no words.
+
+For example, with a chunk size of 10 words and an overlap of 3 words:
+
+Chunk 1: Words 1–10
+Chunk 2: Words 8–17
+Chunk 3: Words 15–24
+Overlapping words help preserve context between consecutive chunks.
+
+# Heading-aware and sentence-aware chunking
+
+The chunk_heading_sentence() function provides an additional strategy that considers Markdown headings, paragraphs, and sentence boundaries when creating chunks.
+
+Features:
+
+Identifies Markdown headings from level 1 to level 6.
+Separates document content into sections based on headings.
+Preserves headings in the generated chunks.
+Splits paragraphs into sentences using punctuation boundaries such as periods, question marks, and exclamation marks.
+Keeps complete sentences together whenever possible.
+Supports configurable chunk size and sentence-based overlap.
+Preserves complete sentences when calculating overlap between consecutive chunks.
+Validates chunk size and overlap settings.
+
+The heading-aware strategy attempts to keep related content together rather than splitting text at arbitrary word positions.
+
+Note: Because complete sentences are preserved, a chunk may exceed the configured word limit if an individual sentence or its heading is larger than the limit. Sentence overlap is also approximate because only complete sentences are reused.
+
+This implementation uses Python's regular expressions and standard string operations. It does not require an external AI model or LangChain.
 JSON Output Format
 
 The output is a JSON array containing all generated chunks.
@@ -101,21 +140,21 @@ Example:
 
 ## Trade-offs
 
-Generator-based document reading - Used a generator instead of returning all document contents at once. This reduces memory usage during reading because documents are yielded one at a time.
+- **Generator-based reading:** Used a generator instead of loading all documents into memory at once. This reduces memory usage during document reading by yielding one document at a time.
 
-Whitespace cleaning instead of aggressive text normalization - Focused on removing unnecessary whitespace while preserving paragraph breaks. This keeps the original document structure more readable.
+- **Whitespace cleaning:** Focused on removing unnecessary whitespace while preserving paragraph breaks instead of aggressively normalizing the content. This helps retain the original document structure.
 
-Removing include markers because their referenced code files are not available in the corpus. This avoids keeping incomplete references in the processed content.
+- **Include marker removal:** Removed include markers because they reference external code files that are not available in the corpus. Processing these references would leave incomplete content in the generated chunks.
 
-Chose word-based chunking because it provides predictable chunk-size limits and straightforward control over overlap. Sentence-aware chunking could preserve sentence boundaries better, but it is outside the current implementation.
+- **Chunk size and overlap:** Chose a default chunk size of 200 words and an overlap of 40 words. This provides manageable chunks while retaining some context between consecutive chunks. Both values can be configured through the CLI.
 
-Configurable chunk size and overlap - Provided default values of 200 words and 40 overlapping words, while allowing users to override them through CLI arguments. This makes the application flexible for different document collections.
+- **Multiple chunking strategies:** Implemented word-based chunking for predictable chunk sizes and heading-aware, sentence-aware chunking for better structural preservation. The latter prioritizes complete sentences, even when this means exceeding the configured chunk size.
 
-Used Pydantic to validate settings and define a consistent structure for generated chunks.
+- **Pydantic models:** Used Pydantic to validate configuration settings and maintain a consistent schema for generated chunks.
 
 ## Results
 
-he Document Toolkit CLI provides an end-to-end workflow for processing a folder of text and Markdown documents.
+The Document Toolkit CLI provides an end-to-end workflow for processing a folder of text and Markdown documents.
 
 The expected results include:
 
@@ -145,4 +184,18 @@ uv run ruff format --check .
 uv run pytest             # tests
 uv run python -m app <input folder > --out <output>  # run the cli
 uv run python -m app corpus --out chunks.json # here corpus is the input folder and chunks.json is the output file
+uv run pytest # run testcase 
+uv run pytest --cov=app #for testing the testcase coverage
 ```
+
+## Known Limitations
+
+- The sentence-aware chunker uses regular expressions, so abbreviations, decimal numbers, and complex punctuation may cause incorrect sentence boundaries.
+- Heading detection supports standard Markdown ATX headings but does not support every Markdown heading syntax.
+- Markdown headings inside fenced code blocks may be incorrectly identified as document headings.
+- Very long sentences or headings may produce chunks larger than the configured chunk size.
+- Word counts are based on whitespace-separated words and may differ from language-model token counts.
+- Word-based chunking does not preserve sentence or paragraph boundaries.
+- Heading-aware and sentence-aware chunking is rule-based and does not understand the semantic meaning of document content.
+- The application does not currently provide semantic chunking or AI-based content understanding.
+- Only the document formats supported by the reader are processed; unsupported formats are ignored.
