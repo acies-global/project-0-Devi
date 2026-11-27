@@ -1,4 +1,3 @@
-
 import sys
 from unittest.mock import patch
 
@@ -35,9 +34,10 @@ def test_cli_runs_successfully(tmp_path, monkeypatch):
         ],
     )
 
-    with patch("app.cli.build_chunks", return_value=[make_chunk()]) as build, \
-         patch("app.cli.write_chunks") as writer:
-
+    with (
+        patch("app.cli.build_chunks", return_value=[make_chunk()]) as build,
+        patch("app.cli.write_chunks") as writer,
+    ):
         cli.main()
 
     build.assert_called_once()
@@ -91,9 +91,7 @@ def test_cli_uses_default_chunk_settings(tmp_path, monkeypatch):
         ],
     )
 
-    with patch("app.cli.build_chunks", return_value=[]) as build, \
-         patch("app.cli.write_chunks"):
-
+    with patch("app.cli.build_chunks", return_value=[]) as build, patch("app.cli.write_chunks"):
         cli.main()
 
     settings = build.call_args.args[1]
@@ -119,9 +117,7 @@ def test_cli_accepts_custom_chunk_size(tmp_path, monkeypatch):
         ],
     )
 
-    with patch("app.cli.build_chunks", return_value=[]) as build, \
-         patch("app.cli.write_chunks"):
-
+    with patch("app.cli.build_chunks", return_value=[]) as build, patch("app.cli.write_chunks"):
         cli.main()
 
     settings = build.call_args.args[1]
@@ -146,9 +142,7 @@ def test_cli_accepts_custom_overlap(tmp_path, monkeypatch):
         ],
     )
 
-    with patch("app.cli.build_chunks", return_value=[]) as build, \
-         patch("app.cli.write_chunks"):
-
+    with patch("app.cli.build_chunks", return_value=[]) as build, patch("app.cli.write_chunks"):
         cli.main()
 
     settings = build.call_args.args[1]
@@ -218,12 +212,14 @@ def test_cli_calls_writer_with_generated_chunks(tmp_path, monkeypatch):
         ],
     )
 
-    with patch("app.cli.build_chunks", return_value=chunks), \
-         patch("app.cli.write_chunks") as writer:
-
+    with (
+        patch("app.cli.build_chunks", return_value=chunks),
+        patch("app.cli.write_chunks") as writer,
+    ):
         cli.main()
 
     writer.assert_called_once_with(chunks, output_file)
+
 
 def test_cli_accepts_custom_toml_config(tmp_path, monkeypatch):
     input_folder = tmp_path / "documents"
@@ -248,9 +244,7 @@ def test_cli_accepts_custom_toml_config(tmp_path, monkeypatch):
         ],
     )
 
-    with patch("app.cli.build_chunks", return_value=[]) as build, \
-         patch("app.cli.write_chunks"):
-
+    with patch("app.cli.build_chunks", return_value=[]) as build, patch("app.cli.write_chunks"):
         cli.main()
 
     settings = build.call_args.args[1]
@@ -286,9 +280,7 @@ def test_cli_arguments_override_toml_config(tmp_path, monkeypatch):
         ],
     )
 
-    with patch("app.cli.build_chunks", return_value=[]) as build, \
-         patch("app.cli.write_chunks"):
-
+    with patch("app.cli.build_chunks", return_value=[]) as build, patch("app.cli.write_chunks"):
         cli.main()
 
     settings = build.call_args.args[1]

@@ -1,4 +1,3 @@
-
 from app.models import Settings
 from app.pipeline import build_chunks
 
@@ -66,7 +65,6 @@ def test_pipeline_skips_whitespace_documents(tmp_path):
     assert chunks == []
 
 
-
 def test_pipeline_generates_unique_chunk_ids(tmp_path):
     (tmp_path / "sample.txt").write_text(
         "This is a sample sentence. " * 500,
@@ -84,7 +82,6 @@ def test_pipeline_generates_unique_chunk_ids(tmp_path):
     assert len(ids) == len(set(ids))
 
 
-
 def test_pipeline_generates_correct_chunk_positions(tmp_path):
     (tmp_path / "sample.txt").write_text(
         " ".join(["word"] * 500),
@@ -93,10 +90,7 @@ def test_pipeline_generates_correct_chunk_positions(tmp_path):
 
     chunks = build_chunks(tmp_path, Settings(size=100, overlap=20))
 
-    positions = [
-        chunk.position
-        for chunk in chunks
-    ]
+    positions = [chunk.position for chunk in chunks]
 
     assert positions == list(range(len(chunks)))
 

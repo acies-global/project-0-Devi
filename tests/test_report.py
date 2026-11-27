@@ -1,4 +1,3 @@
-
 from app.models import Chunk
 from app.report import build_summary_report, format_summary_report
 
@@ -122,8 +121,7 @@ def test_report_distribution_bucket_boundaries():
     sizes = [1, 50, 51, 100, 101, 150, 151, 200, 201]
 
     chunks = [
-        make_chunk(f"doc{i}.txt", 0, " ".join(["word"] * size))
-        for i, size in enumerate(sizes)
+        make_chunk(f"doc{i}.txt", 0, " ".join(["word"] * size)) for i, size in enumerate(sizes)
     ]
 
     report = build_summary_report(chunks, 200)
